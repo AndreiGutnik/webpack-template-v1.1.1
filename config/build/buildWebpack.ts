@@ -14,7 +14,7 @@ export function buildWebpack(options: BuildOptions): webpack.Configuration {
     mode: mode ?? 'development',
     entry: paths.entry,
     output: {
-      publicPath: isDev ? '/' : '/repo_name/',
+      publicPath: isDev ? '/' : '/webpack-template-v1.1.1/',
       path: paths.output,
       filename: '[name].[contenthash].js',
       clean: true,

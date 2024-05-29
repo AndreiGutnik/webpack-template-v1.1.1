@@ -17,7 +17,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
       loading={null}
       persistor={persistor}
     > */}
-    <BrowserRouter basename={isDev ? '/' : '/repo_name/'}>
+    <BrowserRouter basename={isDev ? '/' : '/webpack-template-v1.1.1/'}>
       <HelmetProvider>
         <App />
       </HelmetProvider>
