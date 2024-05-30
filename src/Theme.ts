@@ -1,1 +1,5 @@
-export const theme = {};
+export const theme = {
+  colors: {
+    red: 'red',
+  },
+};
