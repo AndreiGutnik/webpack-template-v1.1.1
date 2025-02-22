@@ -1,7 +1,9 @@
 import axios from 'axios';
 
-export const API_URL = 'http://localhost:5000';
-//export const API_URL = 'server url';
+import config from '@/config';
+import { AuthResponse } from '@/types';
+
+const API_URL = config.apiUrl;
 
 const $api = axios.create({
   withCredentials: true,
@@ -19,9 +21,10 @@ $api.interceptors.response.use(
   },
   async error => {
     const originalRequest = error.config;
-    if (error.response.atatus == 401) {
+    if (error.response.status == 401 && error.config && !error.config._isRetry) {
+      originalRequest._isRetry = true;
       try {
-        const response = await axios.get(`${API_URL}/api/user/refresh`, {
+        const response = await axios.get<AuthResponse>(`${API_URL}/user/refresh`, {
           withCredentials: true,
         });
         localStorage.setItem('token', response.data.accessToken);
@@ -30,6 +33,7 @@ $api.interceptors.response.use(
         console.log('Not authorized');
       }
     }
+    throw error;
   }
 );
 

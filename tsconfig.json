@@ -3,18 +3,23 @@
     "outDir": "./dist/",
     "noImplicitAny": true,
     "module": "ESNext",
-    "target": "es5",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "target": "esnext",
     "jsx": "react-jsx",
     "allowJs": true,
     "moduleResolution": "node",
-		"allowSyntheticDefaultImports": true,
+    "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-		"baseUrl": ".",
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     }
   },
-	"ts-node": {
+  "include": ["src"],
+  "exclude": ["node_modules", "dist", "public", "config"],
+  "ts-node": {
     "compilerOptions": {
       "module": "CommonJS"
     }

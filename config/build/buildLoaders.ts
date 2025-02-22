@@ -1,6 +1,5 @@
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import ReactRefreshTypeScript from 'react-refresh-typescript';
-import { ModuleOptions, runtime } from 'webpack';
+import { ModuleOptions } from 'webpack';
 
 import { buildBabelLoader } from './babel/buildBabelLoader';
 import { BuildOptions } from './types/types';
@@ -18,26 +17,10 @@ export function buildLoaders(options: BuildOptions): ModuleOptions['rules'] {
     },
   };
 
-  //SVG sprite
-  const sbgSpriteLoader = {
-    test: /\.svg$/i,
-    include: /.*_sprite\.svg/,
-    use: [
-      {
-        loader: 'svg-sprite-loader',
-        options: {
-          publicPath: '',
-          runtimeCompat: true,
-        },
-      },
-    ],
-  };
-
   //SVG
   const svgLoader = {
     test: /\.svg$/i,
     issuer: /\.[jt]sx?$/,
-    exclude: /.*_sprite\.svg/,
     use: [
       {
         loader: '@svgr/webpack',
@@ -66,6 +49,35 @@ export function buildLoaders(options: BuildOptions): ModuleOptions['rules'] {
       publicPath: 'images/',
       outputPath: 'images/',
     },
+    parser: {
+      dataUrlCondition: {
+        maxSize: 8 * 1024, // Изображения < 8KB инлайнить в base64
+      },
+    },
+    use: [
+      {
+        loader: 'image-webpack-loader',
+        options: {
+          mozjpeg: {
+            progressive: true,
+            quality: 75, // Сжатие JPEG
+          },
+          optipng: {
+            enabled: true,
+          },
+          pngquant: {
+            quality: [0.65, 0.9], // Сжатие PNG
+            speed: 4,
+          },
+          gifsicle: {
+            interlaced: false,
+          },
+          webp: {
+            quality: 75, // Конвертация в WebP
+          },
+        },
+      },
+    ],
   };
 
   //CSS
@@ -74,32 +86,8 @@ export function buildLoaders(options: BuildOptions): ModuleOptions['rules'] {
     use: [isDev ? 'style-loader' : MiniCssExtractPlugin.loader, 'css-loader'],
   };
 
-  //ts-loader
-  const tsLoader = {
-    test: /\.tsx?$/,
-    use: [
-      {
-        loader: 'ts-loader',
-        options: {
-          getCustomTransformers: () => ({
-            before: [isDev && ReactRefreshTypeScript()].filter(Boolean),
-          }),
-          transpileOnly: isDev,
-        },
-      },
-    ],
-    exclude: /node_modules/,
-  };
-
   //babel-loader
   const babelLoader = buildBabelLoader(options);
 
-  return [
-    assetLoader,
-    cssLoader,
-    //tsLoader,
-    babelLoader,
-    svgLoader,
-    fontsLoader,
-  ];
+  return [assetLoader, cssLoader, babelLoader, svgLoader, fontsLoader];
 }

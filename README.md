@@ -1,4 +1,4 @@
-# webpack-template v1.1.1
+# Webpack React TS template v1.1.1
 
 - webpack
 - babel
