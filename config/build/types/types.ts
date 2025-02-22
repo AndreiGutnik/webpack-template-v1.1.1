@@ -4,7 +4,7 @@ export interface BuildPaths {
   output: string;
   public: string;
   src: string;
-  publicpath: string;
+  publicpath?: string;
 }
 
 export type BuildMode = 'production' | 'development';
