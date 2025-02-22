@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "Webpack template with react and typescript",
   "main": "index.js",
-  "homepage": "https://andreigutnik.github.io/webpack-template-v1.1.1/",
   "scripts": {
     "start": "webpack serve --env mode=development",
     "dev": "webpack --env mode=development",
