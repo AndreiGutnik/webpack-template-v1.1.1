@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkwebpack_react_ts_template=self.webpackChunkwebpack_react_ts_template||[]).push([[500],{8500(e,t,a){a.r(t),a.d(t,{default:()=>r});var c=a(6149),p=a(6090),s=a(4848);function r(){var e=(0,c.B)().t;return(0,s.jsxs)("div",{className:"container",style:{paddingTop:"40px"},children:[(0,s.jsx)("h1",{children:e("app.productTitle")}),(0,s.jsx)(p.N_,{to:"..",children:e("app.back")})]})}}}]);
+//# sourceMappingURL=500.666edb0be4a0edae4989.js.map

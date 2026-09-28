@@ -1,0 +1,10 @@
+{
+  "app": {
+    "title": "Výchozí projekt",
+    "description": "Šablona aplikace React s Ant Design a podporou více jazyků.",
+    "productLink": "Otevřít stránku produktu",
+    "productTitle": "Stránka produktu",
+    "back": "Zpět",
+    "language": "Jazyk"
+  }
+}
