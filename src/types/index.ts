@@ -1,31 +1,49 @@
 export interface IUser {
-  _id: string;
+  id: number;
+  name: string;
+  lastname: string;
   email: string;
   verify: boolean;
-  firstname?: string;
-  lastname?: string;
+  role: IRole;
+}
+
+interface IRole {
+  id: number;
+  name: string;
+  permissions: IPermission[];
+}
+
+interface IPermission {
+  id: number;
+  resource: string;
+  action: string;
 }
 
 //Auth
 
+type AuthStatus = 'checking' | 'authenticated' | 'unauthenticated';
+
 export interface AuthState {
-  user: { user: IUser };
-  token: string | null;
-  isLoggedIn: boolean;
-  isRefreshing: boolean;
+  user: IUser | null;
+  accessToken: string | null;
+  status: AuthStatus;
 }
 
 export interface AuthResponse {
   user: IUser;
   accessToken: string;
-  refreshToken: string;
-}
-
-export interface CredentialsSignUp extends CredentialsLogIn {
-  fullname: string;
 }
 
 export interface CredentialsLogIn {
   email: string;
   password: string;
+}
+
+export interface CredentialsSignUp extends CredentialsLogIn {
+  name: string;
+  lastname: string;
+}
+
+export interface IErrorResponse {
+  message?: string | string[];
 }

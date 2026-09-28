@@ -1,5 +1,6 @@
 const config = {
-  apiUrl: 'http://localhost:5000',
+  apiUrl: process.env.API_URL,
+  apiTimeout: 15_000,
 };
 
 export default config;

@@ -17,10 +17,26 @@ export function buildLoaders(options: BuildOptions): ModuleOptions['rules'] {
     },
   };
 
+  //SVG sprite
+  const svgSpriteLoader = {
+    test: /\.svg$/i,
+    include: /.*_sprite\.svg/,
+    use: [
+      {
+        loader: 'svg-sprite-loader',
+        options: {
+          publicPath: '',
+          runtimeCompat: true,
+        },
+      },
+    ],
+  };
+
   //SVG
   const svgLoader = {
     test: /\.svg$/i,
     issuer: /\.[jt]sx?$/,
+    exclude: /.*_sprite\.svg/,
     use: [
       {
         loader: '@svgr/webpack',
@@ -41,43 +57,29 @@ export function buildLoaders(options: BuildOptions): ModuleOptions['rules'] {
     ],
   };
 
+  const svgAssetLoader = {
+    test: /\.svg$/i,
+    issuer: /\.css$/i,
+    type: 'asset/resource',
+    generator: {
+      publicPath: 'images/',
+      outputPath: 'images/',
+    },
+  };
+
   //assets images
   const assetLoader = {
-    test: /\.(png|jpg|jpeg|gif)$/i,
-    type: 'asset/resource',
+    test: /\.(png|jpe?g|gif|webp|avif|bmp)$/i,
+    type: 'asset',
     generator: {
       publicPath: 'images/',
       outputPath: 'images/',
     },
     parser: {
       dataUrlCondition: {
-        maxSize: 8 * 1024, // Изображения < 8KB инлайнить в base64
+        maxSize: 8 * 1024,
       },
     },
-    use: [
-      {
-        loader: 'image-webpack-loader',
-        options: {
-          mozjpeg: {
-            progressive: true,
-            quality: 75, // Сжатие JPEG
-          },
-          optipng: {
-            enabled: true,
-          },
-          pngquant: {
-            quality: [0.65, 0.9], // Сжатие PNG
-            speed: 4,
-          },
-          gifsicle: {
-            interlaced: false,
-          },
-          webp: {
-            quality: 75, // Конвертация в WebP
-          },
-        },
-      },
-    ],
   };
 
   //CSS
@@ -86,8 +88,52 @@ export function buildLoaders(options: BuildOptions): ModuleOptions['rules'] {
     use: [isDev ? 'style-loader' : MiniCssExtractPlugin.loader, 'css-loader'],
   };
 
+  //SCSS
+  const sassLoader = {
+    loader: 'sass-loader',
+    options: {
+      sassOptions: {
+        loadPaths: [options.paths.src],
+      },
+      additionalData: `@use "styles/mixins" as *;`,
+    },
+  };
+
+  const scssModuleLoader = {
+    test: /\.module\.scss$/i,
+    use: [
+      isDev ? 'style-loader' : MiniCssExtractPlugin.loader,
+      {
+        loader: 'css-loader',
+        options: {
+          modules: {
+            namedExport: false,
+            localIdentName: isDev ? '[name]__[local]__[hash:base64:5]' : '[hash:base64:8]',
+          },
+        },
+      },
+      sassLoader,
+    ],
+  };
+
+  const scssLoader = {
+    test: /\.scss$/i,
+    exclude: /\.module\.scss$/i,
+    use: [isDev ? 'style-loader' : MiniCssExtractPlugin.loader, 'css-loader', sassLoader],
+  };
+
   //babel-loader
   const babelLoader = buildBabelLoader(options);
 
-  return [assetLoader, cssLoader, babelLoader, svgLoader, fontsLoader];
+  return [
+    assetLoader,
+    cssLoader,
+    scssModuleLoader,
+    scssLoader,
+    babelLoader,
+    svgSpriteLoader,
+    svgLoader,
+    svgAssetLoader,
+    fontsLoader,
+  ];
 }

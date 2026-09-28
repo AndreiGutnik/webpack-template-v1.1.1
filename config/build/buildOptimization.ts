@@ -1,42 +1,49 @@
-import { Configuration } from 'webpack';
+import type { Configuration } from 'webpack';
+
+import type { BuildMode } from './types/types';
 
 const TerserPlugin = require('terser-webpack-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 
-export function buildOptimization(): Configuration['optimization'] {
+export function buildOptimization(mode: BuildMode): Configuration['optimization'] {
+  const isProd = mode === 'production';
+
   return {
-    minimize: true, // Включить минимизацию
-    minimizer: [
-      new TerserPlugin({
-        terserOptions: {
-          format: {
-            comments: false, // Удаляет комментарии
-          },
-          compress: {
-            drop_console: true, // Убирает console.log
-          },
-        },
-        extractComments: false,
-      }),
-      new CssMinimizerPlugin(),
-    ],
+    minimize: isProd,
+    minimizer: isProd
+      ? [
+          new TerserPlugin({
+            terserOptions: {
+              format: {
+                comments: false,
+              },
+              compress: {
+                drop_console: true,
+              },
+            },
+            extractComments: false,
+          }),
+          new CssMinimizerPlugin(),
+        ]
+      : undefined,
+    runtimeChunk: isProd ? 'single' : false,
     splitChunks: {
-      chunks: 'all', // Разделять все модули
-      minSize: 30 * 1024, // Минимальный размер файла 30KB
-      maxSize: 244 * 1024, // Максимальный размер чанка (как в предупреждении Webpack)
-      maxInitialRequests: 5, // Макс. число запросов при первой загрузке
-      maxAsyncRequests: 7, // Макс. число асинхронных запросов
-      automaticNameDelimiter: '-', // Разделитель в именах файлов
+      chunks: 'all',
+      minSize: 30 * 1024,
+      maxSize: 244 * 1024,
+      maxInitialRequests: 5,
+      maxAsyncRequests: 7,
+      automaticNameDelimiter: '-',
       cacheGroups: {
         vendors: {
           test: /[\\/]node_modules[\\/]/,
           name: 'vendors',
           priority: -10,
-          enforce: true, // Всегда разделять библиотеки
+          enforce: true,
         },
         common: {
           test: /[\\/]src[\\/]/,
-          minChunks: 2, // Общие модули, используемые 2+ раз
+          minChunks: 2,
           name: 'common',
           priority: -20,
           reuseExistingChunk: true,

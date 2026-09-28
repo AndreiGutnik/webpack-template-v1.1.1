@@ -14,7 +14,7 @@ export function buildBabelLoader({ mode }: BuildOptions) {
     ],
   ];
 
-  const plugins = ['@babel/plugin-syntax-dynamic-import', 'babel-plugin-styled-components'];
+  const plugins: string[] = [];
 
   if (isDev) {
     plugins.push('react-refresh/babel');

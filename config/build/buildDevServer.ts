@@ -5,6 +5,9 @@ import { BuildOptions } from './types/types';
 export function buildDevServer(options: BuildOptions): DevServerConfiguration {
   return {
     port: options.port ?? 3000,
+    static: {
+      directory: options.paths.public,
+    },
     open: true,
     hot: true,
     historyApiFallback: true,

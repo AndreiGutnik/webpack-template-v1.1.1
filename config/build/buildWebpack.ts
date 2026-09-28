@@ -15,12 +15,12 @@ export function buildWebpack(options: BuildOptions): webpack.Configuration {
     mode: mode ?? 'development',
     entry: paths.entry,
     output: {
-      publicPath: isDev ? '' : options.paths.publicpath,
+      publicPath: isDev ? '' : (options.paths.publicpath ?? '/'),
       path: paths.output,
       filename: '[name].[contenthash].js',
       clean: true,
     },
-    optimization: buildOptimization(), // Настройте Webpack для разделения кода
+    optimization: buildOptimization(mode), // Настройте Webpack для разделения кода
     plugins: buildPlugins(options),
     module: {
       rules: buildLoaders(options),

@@ -1,6 +1,5 @@
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
 import CopyPlugin from 'copy-webpack-plugin';
-import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import path from 'path';
@@ -13,6 +12,11 @@ export function buildPlugins(options: BuildOptions): Configuration['plugins'] {
   const isProd = options.mode === 'production';
 
   const plugins: Configuration['plugins'] = [
+    new webpack.DefinePlugin({
+      'process.env.API_URL': JSON.stringify(
+        process.env.API_URL ?? 'https://ypsilonworkcrm.sunsetcore.cz'
+      ),
+    }),
     new HtmlWebpackPlugin({
       template: options.paths.html,
       favicon: path.resolve(options.paths.public, 'favicon.ico'),
@@ -21,7 +25,6 @@ export function buildPlugins(options: BuildOptions): Configuration['plugins'] {
 
   if (isDev) {
     plugins.push(new webpack.ProgressPlugin());
-    plugins.push(new ForkTsCheckerWebpackPlugin());
     plugins.push(new ReactRefreshWebpackPlugin());
   }
 
@@ -38,6 +41,10 @@ export function buildPlugins(options: BuildOptions): Configuration['plugins'] {
           {
             from: path.resolve(options.paths.public, 'locales'),
             to: path.resolve(options.paths.output, 'locales'),
+          },
+          {
+            from: path.resolve(options.paths.public, 'icons'),
+            to: path.resolve(options.paths.output, 'icons'),
           },
           {
             from: path.resolve(options.paths.public, '404.html'),

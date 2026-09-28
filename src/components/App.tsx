@@ -1,20 +1,46 @@
 import { lazy } from 'react';
-import { Link, Route, Routes } from 'react-router-dom';
-import { ThemeProvider } from 'styled-components';
+import { Route, Routes } from 'react-router-dom';
 
 import { Layout } from './Layout';
-import { GlobalStyle } from '@/Globalstyle';
-import { theme } from '@/Theme';
 import { routes } from '@/routes';
+import { GuestOnly } from './GuestOnly/GuestOnly';
+import { RequireAuth } from './RequireAuth/RequireAuth';
 
-const MainPage = lazy(() => import('@/pages/MainPage/MainPage'));
+// const MainPage = lazy(() => import('@/pages/MainPage/MainPage'));
+const LoginPage = lazy(() => import('@/pages/LoginPage/LoginPage'));
+const WelcomePage = lazy(() => import('@/pages/WelcomePage/WelcomePage'));
+const ProductPage = lazy(() => import('@/pages/ProductPage/ProductPage'));
 
 export const App = () => {
   return (
-    <ThemeProvider theme={theme}>
+    <>
       <Routes>
         <Route
-          path={routes.HOME}
+          path={routes.LOCALIZED}
+          element={<Layout />}
+        >
+          <Route element={<GuestOnly />}>
+            <Route
+              path={routes.LOGIN}
+              element={<LoginPage />}
+            />
+          </Route>
+
+          <Route element={<RequireAuth />}>
+            <Route
+              index
+              element={<WelcomePage />}
+            />
+
+            <Route
+              path={routes.PRODUCT}
+              element={<ProductPage />}
+            />
+          </Route>
+        </Route>
+
+        {/* <Route
+          path={routes.LOCALIZED}
           element={<Layout />}
         >
           <Route
@@ -22,17 +48,11 @@ export const App = () => {
             element={<MainPage />}
           />
           <Route
-            path="/product"
-            element={
-              <>
-                <p>Product</p>
-                <Link to="/">Back</Link>
-              </>
-            }
+            path="product"
+            element={<ProductPage />}
           />
-        </Route>
+        </Route> */}
       </Routes>
-      <GlobalStyle />
-    </ThemeProvider>
+    </>
   );
 };

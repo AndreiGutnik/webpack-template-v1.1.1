@@ -1,0 +1,5 @@
+{
+  "cssModules.pathAlias": {
+    "@": "${workspaceFolder}/src"
+  }
+}

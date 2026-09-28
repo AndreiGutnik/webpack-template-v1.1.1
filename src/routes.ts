@@ -1,3 +1,8 @@
 export const routes = {
-  HOME: '/',
-};
+  ROOT: '/',
+  LOCALIZED: '/:locale',
+
+  HOME: '.',
+  LOGIN: 'login',
+  PRODUCT: 'product',
+} as const;

@@ -1,0 +1,50 @@
+.headerWrapper {
+  // position: fixed;
+  top: 0;
+  width: 100%;
+  background-image: var(--backgroundHeader);
+  opacity: 0.9;
+  opacity: initial;
+  z-index: 1000;
+}
+
+.headerContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 16px;
+
+  @include md-up {
+    padding: 8.5px 40px;
+  }
+
+  @include xxl-up {
+    padding: 15px 40px;
+  }
+}
+
+.logoLink {
+  display: flex;
+  align-items: center;
+}
+
+.logoYp {
+  width: 50px;
+  height: 28px;
+
+  @include md-up {
+    width: 98px;
+    height: 58px;
+  }
+
+  @include xxl-up {
+    width: 126px;
+    height: 74px;
+  }
+
+  /* Это поможет сделать содержимое SVG адаптивным */
+  & use {
+    width: 100%;
+    height: 100%;
+  }
+}
