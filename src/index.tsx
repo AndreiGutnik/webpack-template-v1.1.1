@@ -8,7 +8,7 @@ import { BrowserRouter } from 'react-router-dom';
 //import { PersistGate } from 'redux-persist/integration/react';
 import { store } from './redux/store';
 // import { persistor } from './redux/store';
-import '@/assets/images/svg_sprite.svg';
+import svgSprite from '@/assets/images/svg_sprite.svg';
 import { App } from '@/components/App';
 import config from '@/config';
 import '@/i18n';
@@ -17,6 +17,7 @@ import { AuthInitializer } from './components/AuthInitializer/AuthInitializer';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
+    <div dangerouslySetInnerHTML={{ __html: svgSprite }} />
     <Provider store={store}>
       {/* <PersistGate
       loading={null}

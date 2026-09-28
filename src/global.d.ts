@@ -36,6 +36,11 @@ declare module '*.bmp' {
   export default assetUrl;
 }
 
+declare module '*_sprite.svg' {
+  const svgSource: string;
+  export default svgSource;
+}
+
 declare module '*.svg' {
   import React from 'react';
   const SVG: React.VFC<React.SVGProps<SVGSVGElement>>;

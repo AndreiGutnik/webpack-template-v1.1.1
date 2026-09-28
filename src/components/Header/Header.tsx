@@ -21,7 +21,7 @@ const Logo: React.FC = React.memo(() => (
       className={cls.logoYp}
       viewBox="0 0 126 74"
     >
-      <use href="#svg_sprite_logo"></use>
+      <use href="#logo"></use>
     </svg>
   </Link>
 ));

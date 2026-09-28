@@ -24,15 +24,7 @@ export function buildLoaders(options: BuildOptions): ModuleOptions['rules'] {
   const svgSpriteLoader = {
     test: /\.svg$/i,
     include: /.*_sprite\.svg/,
-    use: [
-      {
-        loader: 'svg-sprite-loader',
-        options: {
-          publicPath: '',
-          runtimeCompat: true,
-        },
-      },
-    ],
+    type: 'asset/source',
   };
 
   //SVG
