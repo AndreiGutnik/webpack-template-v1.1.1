@@ -1,0 +1,19 @@
+import { Navigate, Outlet } from 'react-router-dom';
+
+import { useAuth } from '@/hooks/useAuth';
+import { routes } from '@/routes';
+
+export const PublicRoute = () => {
+  const { isAuthenticated } = useAuth();
+
+  if (isAuthenticated) {
+    return (
+      <Navigate
+        to={routes.HOME}
+        replace
+      />
+    );
+  }
+
+  return <Outlet />;
+};

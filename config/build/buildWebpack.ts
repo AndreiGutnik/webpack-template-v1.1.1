@@ -15,7 +15,7 @@ export function buildWebpack(options: BuildOptions): webpack.Configuration {
     mode: mode ?? 'development',
     entry: paths.entry,
     output: {
-      publicPath: isDev ? '' : (options.paths.publicpath ?? '/'),
+      publicPath: options.paths.publicpath ?? options.appBasePath,
       path: paths.output,
       filename: '[name].[contenthash].js',
       clean: true,

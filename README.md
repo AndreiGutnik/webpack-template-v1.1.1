@@ -1,6 +1,6 @@
 # Webpack React TypeScript Template
 
-Стартовый шаблон SPA на React 19 и TypeScript с собственной конфигурацией Webpack 5. В шаблоне уже настроены маршрутизация, локализация, SCSS/CSS Modules, адаптивные миксины, локальные шрифты, SVG-спрайт, алиасы импортов, Axios, заготовка Redux Toolkit и production-сборка.
+Стартовый шаблон SPA на React 19 и TypeScript с Webpack 5. В проекте настроены локализованные маршруты, публичные и приватные страницы, Redux Toolkit Query для backend-запросов, Sass/CSS Modules, адаптивные миксины, локальные шрифты, SVG-спрайт и production-сборка. Axios не используется.
 
 ## Требования и запуск
 
@@ -25,13 +25,12 @@ npm run build      # production-сборка в dist
 
 ## Что используется
 
-- React 19, TypeScript и Babel;
+- React 19, TypeScript 7 и Babel;
 - Webpack 5 и webpack-dev-server;
-- React Router;
+- React Router 7;
+- Redux Toolkit и Redux Toolkit Query;
 - Sass и CSS Modules;
 - i18next и react-i18next;
-- Axios;
-- Redux Toolkit и redux-persist (как заготовка);
 - React Helmet Async;
 - Ant Design.
 
@@ -45,11 +44,14 @@ public/                   файлы без обработки Webpack
 src/
   assets/fonts/           локальные шрифты
   assets/images/          изображения и SVG-спрайт
-  components/             общие компоненты и Layout
+  components/             Layout, Header, route guards и UI-компоненты
   pages/                  страницы
-  redux/                  store, хуки и Axios-клиент
+  redux/                  store, auth slice и RTK Query API slices
+  hooks/                  общие хуки, включая useAuth
   styles/globals.scss     глобальные стили, переменные и container
   styles/mixins.scss      адаптивные SCSS-миксины
+  config.ts               defaultLocale, apiUrl и appBasePath
+  locales.ts              список локалей и функции для locale/base path
   i18n.ts                 локализация
   index.tsx               точка входа
   routes.ts               константы маршрутов
@@ -100,7 +102,7 @@ CSS Modules генерирует уникальные классы. Исполь
 </div>
 ```
 
-Это аналог `styled(Container)`: элемент получает свойства глобального контейнера и локальные свойства компонента.
+Элемент получает свойства глобального контейнера и локальные свойства CSS Module.
 
 ## Контейнер
 
@@ -220,17 +222,34 @@ PNG, JPEG, GIF, WebP, AVIF и BMP меньше 8 КБ могут встраив�
 
 ## Маршрутизация и Layout
 
-Маршруты объявляются в `src/components/App.tsx`. `src/components/Layout.tsx` содержит общие элементы и `<Outlet />` для текущей страницы.
+Список путей находится в `src/routes.ts`, дерево маршрутов — в `src/components/App.tsx`. Все страницы открываются с locale-префиксом:
+
+| Путь | Доступ | Назначение |
+| --- | --- | --- |
+| `/` | публичный redirect | перенаправляет на locale из URL/сохранённого выбора или `defaultLocale` |
+| `/:locale/login` | публичный (`PublicRoute`) | форма входа; авторизованный пользователь перенаправляется на `/:locale/` |
+| `/:locale/` | приватный (`PrivateRoute`) | приветственная страница |
+| `/:locale/product` | приватный (`PrivateRoute`) | пример страницы продукта |
+
+Поддерживаемые locale: `ru`, `cz`, `ua`. `Layout` проверяет locale, показывает общий `Header` и рендерит дочернюю страницу через `<Outlet />`. Неизвестный путь под допустимым locale перенаправляется на главную этого locale.
+
+`AuthInitializer` запускает `POST /auth/refresh` при старте приложения. Пока Redux auth status равен `checking`, показывается fullscreen spinner; после ответа доступ к приватным/публичным маршрутам определяется `PrivateRoute` и `PublicRoute` через общий `useAuth`.
 
 ```tsx
 import { lazy } from 'react';
+import { Route } from 'react-router-dom';
 
-const AboutPage = lazy(() => import('@/pages/AboutPage/AboutPage'));
+import { PrivateRoute } from '@/components/PrivateRoute';
 
-<Route path="about" element={<AboutPage />} />;
+const AccountPage = lazy(() => import('@/pages/AccountPage/AccountPage'));
+
+// Добавьте этот блок внутрь маршрута /:locale с Layout.
+<Route element={<PrivateRoute />}>
+  <Route path="account" element={<AccountPage />} />
+</Route>;
 ```
 
-Для внутренних переходов используйте `Link` или `navigate`, чтобы не перезагружать SPA.
+Для внутренних переходов используйте `Link` или `navigate`, чтобы не перезагружать SPA и сохранить locale-префикс.
 
 ### Fixed Header
 
@@ -248,7 +267,7 @@ const AboutPage = lazy(() => import('@/pages/AboutPage/AboutPage'));
 
 ## Локализация
 
-Поддерживаются `ru`, `cz` и `ua`. Переводы находятся в `public/locales/*.json`, язык добавляется в URL, сохраняется в `localStorage`, запасной язык — русский.
+Поддерживаются `ru`, `cz` и `ua`; список находится в `src/locales.ts`, а язык по умолчанию задаётся как `defaultLocale` в `src/config.ts`. Переводы находятся в `public/locales/ru.json`, `cz.json` и `ua.json`. Locale в URL имеет приоритет; выбор флага сохраняется в `localStorage` под ключом `app-locale` и используется при следующем заходе на `/`. При первом запуске без locale в URL и сохранённого выбора используется `defaultLocale`; язык системы автоматически не выбирается.
 
 ```tsx
 import { useTranslation } from 'react-i18next';
@@ -262,9 +281,8 @@ export const Example = () => {
 Новый ключ добавляйте во все языковые файлы. Чтобы добавить язык:
 
 1. Создайте JSON в `public/locales`.
-2. Обновите `supportedLngs` и регулярные выражения в `src/i18n.ts`.
-3. Обновите `languages` и тип `Language` в `LanguageSwitcher.tsx`.
-4. Добавьте флаг в `public/icons`.
+2. Добавьте код в `supportedLocales` в `src/locales.ts`.
+3. Добавьте имя языка в `LanguageSwitcher/LanguageSwitcher.tsx` и флаг в `public/icons`.
 
 ## CSS-переменные
 
@@ -281,32 +299,30 @@ export const Example = () => {
 
 Меняйте палитру в переменных, а не во всех компонентах.
 
-## API
+## Backend-запросы
 
-Общий Axios-клиент экспортируется из `src/redux/http`:
+Все запросы к backend выполняются через **Redux Toolkit Query** (`fetchBaseQuery`); Axios-клиента в проекте нет. `src/config.ts` — единственная точка настройки приложения: `defaultLocale` задаёт язык по умолчанию, `apiUrl` — базовый URL backend, `appBasePath` — путь публикации приложения. `apiUrl` используется общим `src/redux/api/baseQuery.ts`.
 
-```ts
-import api from '@/redux/http';
+- `authApi.ts`: вход, обновление сессии и выход;
+- `userApi.ts`: регистрация и проверка email;
+- `baseQuery.ts`: отправляет cookies (`credentials: 'include'`) и bearer-токен из Redux auth state;
+- `baseQueryWithReauth.ts`: `userApi` при `401` вызывает `/auth/refresh`, обновляет auth state и повторяет исходный запрос; при неудачном refresh выполняет logout. `authApi` использует обычный `baseQuery`, чтобы refresh-запрос не запускал повторный refresh.
 
-const response = await api.get('/resource');
+Пример mutation hook:
+
+```tsx
+const handleSubmit = async (values: CredentialsLogIn) => {
+  // login and dispatch are obtained from RTK Query and Redux hooks in the component.
+  const credentials = await login(values).unwrap();
+  dispatch(setCredentials(credentials));
+};
 ```
 
-По умолчанию используются URL `https://ypsilonworkcrm.sunsetcore.cz`, таймаут 15 секунд, `withCredentials`, bearer-токен и одна повторная попытка после обновления токена при `401`.
-
-```bash
-API_URL=https://api.example.com npm start
-API_URL=https://api.example.com npm run build
-```
+Новые endpoints добавляйте в соответствующий API slice и используйте сгенерированные RTK Query hooks. Не создавайте отдельный Axios client или прямые `fetch`-запросы.
 
 ## Redux Toolkit
 
-Store подготовлен в `src/redux/store.ts`, но `Provider` и `PersistGate` в `src/index.tsx` закомментированы. Если Redux нужен:
-
-1. Добавьте reducer в `configureStore`.
-2. Раскомментируйте `Provider`, `PersistGate`, `store` и `persistor`.
-3. Используйте типизированные хуки из `src/redux/hooks.ts`.
-
-Если Redux не нужен, удалите его файлы и зависимости.
+Redux store подключён через `<Provider>` в `src/index.tsx`. В нём зарегистрированы auth slice, `authApi` и `userApi`, их middleware включены. Для компонентов используйте типизированные hooks из `src/redux/hooks.ts`; состояние аутентификации читайте через `src/hooks/useAuth.ts`. Пакет `redux-persist` пока не подключён к store.
 
 ## Метаданные
 
@@ -330,7 +346,7 @@ npm run build
 
 Результат появляется в `dist`. Production-сборка минимизирует CSS/JavaScript, разделяет chunks, добавляет content hash и копирует публичные ресурсы.
 
-Шаблон настроен для корня домена. При публикации в подкаталоге синхронно измените `BrowserRouter basename`, Webpack `output.publicPath` и пути публичных ресурсов. Сервер должен возвращать `index.html` для неизвестных SPA-маршрутов; для статического хостинга предусмотрен `public/404.html`.
+По умолчанию шаблон работает в корне домена. Путь публикации задаётся только в `src/config.ts` через `appBasePath`; это значение Webpack использует для `BrowserRouter basename`, chunks, переводов, флагов, шрифтов и изображений. Для публикации в подкаталоге измените его, например, на `/shop/`, и выполните сборку. Сервер должен возвращать `index.html` для неизвестных SPA-маршрутов; для статического хостинга предусмотрен `public/404.html`.
 
 ## Чек-лист нового проекта
 
@@ -339,8 +355,8 @@ npm run build
 3. Настройте переменные и `.container` в `globals.scss`.
 4. Удалите отладочный `outline` контейнера.
 5. Замените логотип, переводы и языки.
-6. Настройте API либо удалите Axios-клиент.
-7. Подключите Redux либо удалите его заготовку.
+6. Укажите API URL в `src/config.ts` и добавляйте endpoints в RTK Query API slices.
+7. Оставьте Redux Toolkit store либо удалите store, slices и связанные зависимости.
 8. Удалите неиспользуемые библиотеки и выполните `npm install`.
 9. Запустите `npm run typecheck` и `npm run build`.
 
