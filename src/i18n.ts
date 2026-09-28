@@ -1,29 +1,39 @@
 import i18n from 'i18next';
-import LanguageDetector from 'i18next-browser-languagedetector';
 import HttpBackend from 'i18next-http-backend';
 import { initReactI18next } from 'react-i18next';
 
-const localeFromPath = window.location.pathname.match(/^\/(ru|cz|ua)(?=\/|$)/)?.[1];
-const pathnameWithoutLocale =
-  window.location.pathname.replace(/^\/(?:ru|cz|ua)(?=\/|$)/, '') || '/';
-export const appBasePath = new URL('.', `${window.location.origin}${pathnameWithoutLocale}`)
-  .pathname;
+import config from '@/config';
+import {
+  getLocaleFromPathname,
+  isLocale,
+  removeBasePath,
+  supportedLocales,
+} from '@/locales';
+
+const routePath = removeBasePath(window.location.pathname, config.appBasePath);
+const localeFromPath = getLocaleFromPathname(routePath);
+const storedLocale = window.localStorage.getItem('app-locale');
+const initialLocale = localeFromPath ?? (isLocale(storedLocale) ? storedLocale : config.defaultLocale);
+
+if (localeFromPath) {
+  window.localStorage.setItem('app-locale', localeFromPath);
+}
+
+const webpackPublicUrl = new URL(__webpack_public_path__, window.location.origin);
+export const appAssetBaseUrl = webpackPublicUrl.href.endsWith('/')
+  ? webpackPublicUrl.href
+  : `${webpackPublicUrl.href}/`;
 
 void i18n
   .use(HttpBackend)
-  .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    lng: localeFromPath,
+    lng: initialLocale,
     backend: {
-      loadPath: `${appBasePath}locales/{{lng}}.json`,
+      loadPath: `${appAssetBaseUrl}locales/{{lng}}.json`,
     },
-    detection: {
-      order: ['localStorage', 'navigator'],
-      caches: ['localStorage'],
-    },
-    fallbackLng: 'ru',
-    supportedLngs: ['ru', 'cz', 'ua'],
+    fallbackLng: config.defaultLocale,
+    supportedLngs: [...supportedLocales],
     defaultNS: 'translation',
     ns: ['translation'],
     interpolation: {

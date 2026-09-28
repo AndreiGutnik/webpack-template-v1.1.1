@@ -1,9 +1,10 @@
 import { fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
+import config from '@/config';
 import type { RootState } from '@/redux/store';
 
 export const baseQuery = fetchBaseQuery({
-  baseUrl: 'https://ypsilonworkcrm.sunsetcore.cz/api',
+  baseUrl: config.apiUrl,
 
   credentials: 'include',
 

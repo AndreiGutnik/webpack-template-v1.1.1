@@ -1,6 +1,9 @@
+import type { Locale } from './locales';
+
 const config = {
-  apiUrl: process.env.API_URL,
-  apiTimeout: 15_000,
+  defaultLocale: 'ru' as Locale,
+  apiUrl: 'https://ypsilonworkcrm.sunsetcore.cz/api',
+  appBasePath: '/',
 };
 
 export default config;

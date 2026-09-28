@@ -10,11 +10,10 @@ import { store } from './redux/store';
 // import { persistor } from './redux/store';
 import '@/assets/images/svg_sprite.svg';
 import { App } from '@/components/App';
+import config from '@/config';
 import '@/i18n';
 import '@/styles/globals.scss';
 import { AuthInitializer } from './components/AuthInitializer/AuthInitializer';
-
-const isDev = process.env.NODE_ENV === 'development';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
@@ -24,7 +23,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
       persistor={persistor}
     > */}
         <AuthInitializer>
-          <BrowserRouter basename={isDev ? '/' : '/'}>
+          <BrowserRouter basename={config.appBasePath === '/' ? '/' : config.appBasePath.slice(0, -1)}>
             <React.Suspense fallback={<Spin fullscreen />}>
               <HelmetProvider>
                 <App />

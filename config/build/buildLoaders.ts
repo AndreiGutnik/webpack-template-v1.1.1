@@ -6,13 +6,16 @@ import { BuildOptions } from './types/types';
 
 export function buildLoaders(options: BuildOptions): ModuleOptions['rules'] {
   const isDev = options.mode === 'development';
+  const assetPublicPath = options.paths.publicpath ?? options.appBasePath;
 
   //fonts
   const fontsLoader = {
     test: /\.(woff|woff2|eot|ttf|otf)$/i,
     type: 'asset/resource',
     generator: {
-      publicPath: 'fonts/',
+      ...(assetPublicPath !== 'auto' && {
+        publicPath: `${assetPublicPath}fonts/`,
+      }),
       outputPath: 'fonts/',
     },
   };
@@ -62,7 +65,9 @@ export function buildLoaders(options: BuildOptions): ModuleOptions['rules'] {
     issuer: /\.css$/i,
     type: 'asset/resource',
     generator: {
-      publicPath: 'images/',
+      ...(assetPublicPath !== 'auto' && {
+        publicPath: `${assetPublicPath}images/`,
+      }),
       outputPath: 'images/',
     },
   };
@@ -72,7 +77,9 @@ export function buildLoaders(options: BuildOptions): ModuleOptions['rules'] {
     test: /\.(png|jpe?g|gif|webp|avif|bmp)$/i,
     type: 'asset',
     generator: {
-      publicPath: 'images/',
+      ...(assetPublicPath !== 'auto' && {
+        publicPath: `${assetPublicPath}images/`,
+      }),
       outputPath: 'images/',
     },
     parser: {

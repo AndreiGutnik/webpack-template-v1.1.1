@@ -12,11 +12,6 @@ export function buildPlugins(options: BuildOptions): Configuration['plugins'] {
   const isProd = options.mode === 'production';
 
   const plugins: Configuration['plugins'] = [
-    new webpack.DefinePlugin({
-      'process.env.API_URL': JSON.stringify(
-        process.env.API_URL ?? 'https://ypsilonworkcrm.sunsetcore.cz'
-      ),
-    }),
     new HtmlWebpackPlugin({
       template: options.paths.html,
       favicon: path.resolve(options.paths.public, 'favicon.ico'),

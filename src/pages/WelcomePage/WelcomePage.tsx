@@ -1,14 +1,12 @@
 import { Typography } from 'antd';
 
-import { useAppSelector } from '@/redux/hooks';
+import { useAuth } from '@/hooks/useAuth';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
 export default function WelcomePage() {
   const { t } = useTranslation();
-  const user = useAppSelector(
-    state => state.auth.user
-  );
+  const { user } = useAuth();
 
   return (
     <div className="container">
@@ -16,7 +14,7 @@ export default function WelcomePage() {
       <p>{t('app.description')}</p>
       <Link to="product">{t('app.productLink')}</Link>
       <Typography.Title level={1}>
-        Добро пожаловать, {user?.name}!
+        Добро пожаловать, {user?.name} {user?.lastname}!
       </Typography.Title>
 
       <Typography.Paragraph>

@@ -5,11 +5,9 @@ import {
 } from 'react';
 import { Spin } from 'antd';
 
+import { useAuth } from '@/hooks/useAuth';
 import { useRefreshMutation } from '@/redux/api/authApi';
-import {
-  useAppDispatch,
-  useAppSelector,
-} from '@/redux/hooks';
+import { useAppDispatch } from '@/redux/hooks';
 import {
   logout,
   setCredentials,
@@ -19,9 +17,7 @@ export const AuthInitializer = ({
   children,
 }: PropsWithChildren) => {
   const dispatch = useAppDispatch();
-  const status = useAppSelector(
-    state => state.auth.status
-  );
+  const { isCheckingAuth } = useAuth();
 
   const [refresh] = useRefreshMutation();
   const initialized = useRef(false);
@@ -46,7 +42,7 @@ export const AuthInitializer = ({
     void initializeAuth();
   }, [dispatch, refresh]);
 
-  if (status === 'checking') {
+  if (isCheckingAuth) {
     return <Spin fullscreen />;
   }
 

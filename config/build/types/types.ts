@@ -12,5 +12,6 @@ export type BuildMode = 'production' | 'development';
 export interface BuildOptions {
   port: number;
   paths: BuildPaths;
+  appBasePath: string;
   mode: BuildMode;
 }
