@@ -10,6 +10,9 @@ export function buildDevServer(options: BuildOptions): DevServerConfiguration {
     },
     open: true,
     hot: true,
+    client: {
+      logging: 'warn',
+    },
     historyApiFallback: true,
   };
 }
